@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI面试模拟器</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <span class="logo-text">AI面试模拟器</span>
+        <button class="theme-toggle-large" id="themeToggle">
+          <span class="theme-icon" id="themeIcon">🌙</span>
+          <span id="themeText">深色</span>
+        </button>
+      </div>
+      <nav class="header-nav">
+        <a href="#" class="nav-link active" data-page="home">首页</a>
+        <a href="#" class="nav-link" data-page="interview" id="navInterview" style="display:none;">面试进行中</a>
+        <a href="#" class="nav-link" data-page="report" id="navReport" style="display:none;">查看报告</a>
+      </nav>
+    </header>
+    <!-- Global Countdown Timer -->
+    <div class="global-timer" id="globalTimer" style="display: none;">
+      <div class="timer-circle">
+        <div class="timer-value" id="timerValue">10:00</div>
+        <div class="timer-label">剩余时间</div>
+      </div>
+      <div class="timer-status" id="timerStatus">运行中</div>
+    </div>
+    <!-- Page: Home -->
+    <div class="page" id="pageHome">
+      <section class="hero">
+        <div class="container">
+          <div class="hero-badge">🎯 智能面试训练系统</div>
+          <h1 class="hero-title"><span>AI驱动</span>的面试训练体验</h1>
+          <p class="hero-subtitle">通过实时语音对话、STAR法则追问、五维能力诊断，助你全面提升面试技能</p>
+          <button class="btn btn-primary btn-lg"
+            onclick="document.querySelector('.scenario-section').scrollIntoView({behavior:'smooth'})">
+            🚀 开始模拟面试
+          </button>
+        </div>
+      </section>
+      <section class="scenario-section section">
+        <div class="container">
+          <div class="section-header">
+            <h2>选择面试场景</h2>
+            <p>根据你的目标选择合适的面试类型</p>
+          </div>
+          <div class="scenario-grid" id="scenarioGrid"></div>
+        </div>
+      </section>
+      <section class="config-section">
+        <div class="container">
+          <div class="section-header">
+            <h2>自定义配置</h2>
+            <p>根据需要调整面试参数</p>
+          </div>
+          <div class="config-grid">
+            <div class="config-card">
+              <div class="config-card-title">基本信息</div>
+              <!-- 专业和岗位并排选择 -->
+              <div class="config-row-row">
+                <div class="config-row-item">
+                  <span class="config-label">专业背景</span>
+                  <select id="majorInput" class="form-select">
+                    <option value="">请选择专业</option>
+                    <!-- 预设专业将通过JS动态加载 -->
+                  </select>
+                </div>
+                <div class="config-row-item">
+                  <span class="config-label">目标岗位</span>
+                  <select id="positionInput" class="form-select">
+                    <option value="">请选择岗位</option>
+                    <!-- 预设岗位将通过JS动态加载 -->
+                  </select>
+                </div>
+              </div>
+              <!-- 自定义专业添加区域 -->
+              <div class="custom-major-section">
+                <div class="custom-major-input-wrapper">
+                  <input type="text" id="customMajorInput" class="form-input custom-major-input"
+                    placeholder="输入自定义专业名称">
+                  <button class="btn btn-sm btn-primary" id="addMajorBtn">添加专业</button>
+                </div>
+                <div class="custom-majors-list" id="customMajorsList">
+                  <!-- 自定义专业列表将通过JS动态加载 -->
+                </div>
+              </div>
+              <!-- 自定义岗位添加区域 -->
+              <div class="custom-position-section">
+                <div class="custom-position-input-wrapper">
+                  <input type="text" id="customPositionInput" class="form-input custom-position-input"
+                    placeholder="输入自定义岗位名称">
+                  <button class="btn btn-sm btn-primary" id="addPositionBtn">添加岗位</button>
+                </div>
+                <div class="custom-positions-list" id="customPositionsList">
+                  <!-- 自定义岗位列表将通过JS动态加载 -->
+                </div>
+              </div>
+            </div>
+            <div class="config-card">
+              <div class="config-card-title">难度设置</div>
+              <div class="difficulty-slider">
+                <span class="difficulty-label" data-level="0">简单</span>
+                <input type="range" id="difficultySlider" min="0" max="2" value="1">
+                <span class="difficulty-label active" data-level="1">中等</span>
+                <span class="difficulty-label" data-level="2">困难</span>
+              </div>
+              <div class="config-row">
+                <span class="config-label">当前难度</span>
+                <span class="config-value" id="difficultyValue">中等</span>
+              </div>
+            </div>
+            <div class="config-card">
+              <div class="config-card-title">面试时长</div>
+              <div class="radio-group">
+                <label class="radio-btn"><input type="radio" name="duration" value="5"><span>5分钟</span></label>
+                <label class="radio-btn"><input type="radio" name="duration" value="10"
+                    checked><span>10分钟</span></label>
+                <label class="radio-btn"><input type="radio" name="duration" value="15"><span>15分钟</span></label>
+                <label class="radio-btn"><input type="radio" name="duration" value="20"><span>20分钟</span></label>
+                <label class="radio-btn"><input type="radio" name="duration" value="custom"
+                    id="durationCustom"><span>自定义</span></label>
+              </div>
+              <div class="custom-duration-input-wrapper" id="customDurationWrapper" style="display: none;">
+                <input type="number" id="customDurationInput" class="form-input custom-duration-input"
+                  placeholder="5-60" min="5" max="60">
+                <button class="btn btn-sm btn-primary" id="confirmDurationBtn">确认</button>
+              </div>
+              <div class="timer-controls" id="timerControls" style="display: none;">
+                <button class="btn btn-sm btn-warning" id="pauseTimerBtn">⏸️ 暂停</button>
+                <button class="btn btn-sm btn-danger" id="resetTimerBtn">🔄 重置</button>
+              </div>
+            </div>
+            <div class="config-card">
+              <div class="config-card-title">提问风格</div>
+              <div class="style-options">
+                <div class="style-option" data-style="gentle">
+                  <div class="style-option-name">温和型</div>
+                  <div class="style-option-desc">轻松氛围</div>
+                </div>
+                <div class="style-option selected" data-style="normal">
+                  <div class="style-option-name">标准型</div>
+                  <div class="style-option-desc">正常节奏</div>
+                </div>
+                <div class="style-option" data-style="pressure">
+                  <div class="style-option-name">压力型</div>
+                  <div class="style-option-desc">增加挑战</div>
+                </div>
+              </div>
+              <input type="hidden" name="style" value="normal">
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="start-section">
+        <div class="container">
+          <div class="start-info">
+            <span>✓ 完全免费使用</span>
+            <span>✓ 实时语音对话</span>
+            <span>✓ 专业报告分析</span>
+          </div>
+          <button class="btn btn-primary btn-lg" id="startBtn" disabled>🎤 开始面试</button>
+        </div>
+      </section>
+    </div>
+    <!-- Page: Interview -->
+    <div class="page" id="pageInterview">
+      <header class="interview-header">
+        <div class="header-left">
+          <button class="back-btn" id="backBtn">←</button>
+          <div class="scenario-tag" id="scenarioTag">💼 校园招聘</div>
+        </div>
+        <div class="timer" id="timer">10:00</div>
+      </header>
+      <div class="interview-main">
+        <div class="interview-content">
+          <div class="interview-left">
+            <div class="ai-interviewer">
+              <div class="ai-avatar">🤖</div>
+              <div class="ai-info">
+                <div class="ai-name">AI面试官</div>
+                <div class="ai-message" id="aiMessage">准备就绪</div>
+              </div>
+            </div>
+            <div class="conversation" id="conversation"></div>
+            <div class="input-area">
+              <button class="mic-btn" id="micBtn" title="按住说话">🎤</button>
+              <input type="text" class="text-input" id="textInput" placeholder="输入你的回答，按Enter发送...">
+              <button class="send-btn" id="sendBtn">➤</button>
+            </div>
+            <div class="audio-visualizer" id="audioVisualizer">
+              <div class="visualizer-bar"></div>
+              <div class="visualizer-bar"></div>
+              <div class="visualizer-bar"></div>
+              <div class="visualizer-bar"></div>
+              <div class="visualizer-bar"></div>
+              <div class="visualizer-bar"></div>
+              <div class="visualizer-bar"></div>
+              <span class="recording-text">正在录音...</span>
+            </div>
+            <div class="progress-section">
+              <div class="progress-info">
+                <div class="progress-label" id="progressLabel">已回答 0 / 0 题</div>
+                <div class="progress-bar">
+                  <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+              </div>
+              <div class="progress-stats">
+                <div class="stat-item">
+                  <div class="stat-value" id="questionCount">0</div>
+                  <div class="stat-label">总题数</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value" id="answerCount">0</div>
+                  <div class="stat-label">已回答</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 实时评分面板 -->
+          <div class="score-panel" id="scorePanel">
+            <div class="score-panel-header">
+              <h3>📊 实时评分</h3>
+              <div class="score-total-wrapper">
+                <div class="score-total" id="scoreTotal">0</div>
+                <div class="grade-badge" id="gradeBadge">未评级</div>
+              </div>
+            </div>
+            <div class="radar-mini-container">
+              <canvas id="radarChartMini"></canvas>
+            </div>
+            <div class="score-dimensions" id="scoreDimensions">
+              <div class="score-dim-item" data-dim="professional">
+                <span class="score-dim-icon">💼</span>
+                <span class="score-dim-name">专业匹配度</span>
+                <span class="score-dim-value"><span id="scoreProfessional">0</span>/25</span>
+              </div>
+              <div class="score-dim-item" data-dim="logic">
+                <span class="score-dim-icon">🧠</span>
+                <span class="score-dim-name">逻辑表达</span>
+                <span class="score-dim-value"><span id="scoreLogic">0</span>/20</span>
+              </div>
+              <div class="score-dim-item" data-dim="adaptability">
+                <span class="score-dim-icon">⚡</span>
+                <span class="score-dim-name">临场应变</span>
+                <span class="score-dim-value"><span id="scoreAdaptability">0</span>/20</span>
+              </div>
+              <div class="score-dim-item" data-dim="professionalism">
+                <span class="score-dim-icon">🎯</span>
+                <span class="score-dim-name">职业素养</span>
+                <span class="score-dim-value"><span id="scoreProfessionalism">0</span>/15</span>
+              </div>
+              <div class="score-dim-item" data-dim="etiquette">
+                <span class="score-dim-icon">💬</span>
+                <span class="score-dim-name">语言礼仪</span>
+                <span class="score-dim-value"><span id="scoreEtiquette">0</span>/20</span>
+              </div>
+            </div>
+            <div class="score-recent" id="scoreRecent">
+              <div class="score-recent-header">最近评分</div>
+              <div class="score-recent-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="end-modal" id="endModal">
+        <div class="end-modal-content">
+          <div class="end-modal-icon">📋</div>
+          <h3>确认结束面试？</h3>
+          <p>你已完成部分面试，现在可以生成报告查看结果</p>
+          <div class="end-modal-actions">
+            <button class="btn btn-secondary" id="cancelEndBtn">继续面试</button>
+            <button class="btn btn-primary" id="confirmEndBtn">结束并查看报告</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page: Report -->
+    <div class="page" id="pageReport">
+      <header class="report-header">
+        <div class="header-left">
+          <button class="back-btn" id="backHomeBtn">←</button>
+          <span>📊 面试复盘报告</span>
+        </div>
+        <button class="btn btn-secondary" id="retryBtn">🔄 重新面试</button>
+      </header>
+      <div class="report-main">
+        <div class="report-content">
+          <div class="score-overview">
+            <div class="score-label">综合得分</div>
+            <div class="score-value" id="scoreValue">0</div>
+            <span class="badge badge-success" id="gradeBadge">暂无评分</span>
+            <div class="score-details">
+              <div class="score-stat">
+                <div class="score-stat-value" id="statQuestions">0</div>
+                <div class="score-stat-label">总题数</div>
+              </div>
+              <div class="score-stat">
+                <div class="score-stat-value" id="statAnswers">0</div>
+                <div class="score-stat-label">已回答</div>
+              </div>
+              <div class="score-stat">
+                <div class="score-stat-value" id="statDuration">0分钟</div>
+                <div class="score-stat-label">面试时长</div>
+              </div>
+            </div>
+          </div>
+          <!-- 评分明细表格 -->
+          <div class="score-table-section" id="scoreTableSection">
+            <div class="score-table-header">
+              <h3>📋 分项得分明细</h3>
+            </div>
+            <table class="score-table" id="scoreTable">
+              <thead>
+                <tr>
+                  <th>题目</th>
+                  <th>专业匹配度</th>
+                  <th>逻辑表达</th>
+                  <th>临场应变</th>
+                  <th>语言礼仪</th>
+                  <th>总分</th>
+                </tr>
+              </thead>
+              <tbody id="scoreTableBody">
+                <!-- JS填充 -->
+              </tbody>
+            </table>
+          </div>
+          <div class="radar-section">
+            <div class="section-header">
+              <h3>📈 五维能力诊断</h3>
+            </div>
+            <div class="radar-container-large">
+              <canvas id="radarChart"></canvas>
+            </div>
+            <div class="dimensions-grid" id="dimensionsGrid"></div>
+          </div>
+          <!-- 综合评语 - 三大独立区域 -->
+          <div class="report-comment-container">
+            <div class="report-comment-section strengths-section">
+              <h3>📊 <strong>优势总结</strong></h3>
+              <div class="report-comment-content" id="reportStrengths">
+                <p>面试完成后查看优势分析...</p>
+              </div>
+            </div>
+            <div class="report-comment-section weaknesses-section">
+              <h3>⚠️ <strong>答题短板</strong></h3>
+              <div class="report-comment-content" id="reportWeaknesses">
+                <p>面试完成后查看短板分析...</p>
+              </div>
+            </div>
+            <div class="report-comment-section summary-section">
+              <h3>📝 <strong>综合面试评价</strong></h3>
+              <div class="report-comment-content" id="reportCommentText">
+                <p>面试完成后查看详细评价...</p>
+              </div>
+            </div>
+          </div>
+          <div class="conversation-section">
+            <div class="section-header">
+              <h3>💬 面试对话回顾</h3>
+            </div>
+            <div class="conversation-history" id="conversationHistory"></div>
+          </div>
+          <div class="analysis-section">
+            <div class="analysis-tabs">
+              <button class="analysis-tab active" data-tab="strengths">优势分析</button>
+              <button class="analysis-tab" data-tab="weaknesses">待改进</button>
+            </div>
+            <div class="analysis-content active" id="strengths">
+              <div class="strengths-list" id="strengthsList"></div>
+            </div>
+            <div class="analysis-content" id="weaknesses">
+              <div class="weaknesses-list" id="weaknessesList"></div>
+            </div>
+          </div>
+          <div class="suggestions-section">
+            <div class="section-header">
+              <h3>💡 改进建议</h3>
+            </div>
+            <div class="suggestions-list" id="suggestionsList"></div>
+          </div>
+          <div class="practice-section">
+            <div class="section-header">
+              <h3>🎯 针对性练习</h3>
+            </div>
+            <div class="practice-grid" id="practiceGrid"></div>
+            <div class="history-btn-wrapper">
+              <button class="btn btn-outline btn-sm" id="viewTrainingHistoryBtn">📜 查看历史训练</button>
+            </div>
+          </div>
+          <div class="report-actions">
+            <button class="btn btn-secondary btn-lg" id="retryInterviewBtn">🔄 重新面试</button>
+            <button class="btn btn-primary btn-lg" id="backHomeBtn2">🏠 返回首页</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 专项训练弹窗 -->
+  <div class="training-modal" id="trainingModal">
+    <div class="training-modal-content">
+      <div class="training-modal-header">
+        <h3 id="trainingModalTitle">💼 专业匹配度训练</h3>
+        <button class="modal-close" id="closeTrainingBtn">&times;</button>
+      </div>
+      <div class="training-modal-body">
+        <div class="training-info">
+          <div class="training-dimension-badge" id="trainingDimensionBadge">
+            <span class="badge-icon">💼</span>
+            <span class="badge-text">专业匹配度</span>
+          </div>
+          <div class="training-score-hint">
+            本次练习将重点评估此项能力
+          </div>
+        </div>
+        <div class="training-timer-wrapper">
+          <div class="training-timer" id="trainingTimer">05:00</div>
+          <div class="training-timer-label">剩余时间</div>
+        </div>
+        <div class="training-question-wrapper">
+          <div class="question-number">第 <span id="trainingQuestionNum">1</span> 题</div>
+          <div class="question-text" id="trainingQuestionText">
+            请选择一个专项训练开始练习...
+          </div>
+        </div>
+        <div class="training-answer-area">
+          <textarea class="answer-input training-answer-input" id="trainingAnswerInput" placeholder="在这里输入你的回答..."
+            rows="5"></textarea>
+          <div class="answer-actions">
+            <button class="btn btn-outline" id="trainingSpeechBtn">
+              <span class="btn-icon">🎤</span> 语音输入
+            </button>
+            <button class="btn btn-primary" id="trainingSubmitBtn">
+              提交回答
+            </button>
+          </div>
+        </div>
+        <div class="training-followup-wrapper" id="trainingFollowupWrapper" style="display: none;">
+          <div class="followup-indicator">追问</div>
+          <div class="question-text" id="trainingFollowupText"></div>
+        </div>
+      </div>
+      <div class="training-modal-footer">
+        <button class="btn btn-secondary" id="trainingEndBtn">结束训练</button>
+      </div>
+    </div>
+  </div>
+  <!-- 训练历史记录弹窗 -->
+  <div class="history-modal" id="historyModal">
+    <div class="history-modal-content">
+      <div class="history-modal-header">
+        <h3>📜 训练历史记录</h3>
+        <button class="modal-close" id="closeHistoryBtn">&times;</button>
+      </div>
+      <div class="history-modal-body">
+        <div class="history-stats">
+          <div class="history-stat-item">
+            <span class="stat-number" id="totalTrainings">0</span>
+            <span class="stat-label">训练次数</span>
+          </div>
+          <div class="history-stat-item">
+            <span class="stat-number" id="avgTrainingScore">0</span>
+            <span class="stat-label">平均得分</span>
+          </div>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="history-empty">暂无训练记录，开始你的第一次专项训练吧！</div>
+        </div>
+      </div>
+      <div class="history-modal-footer">
+        <button class="btn btn-secondary" id="clearHistoryBtn">清空记录</button>
+        <button class="btn btn-primary" id="closeHistoryModalBtn">关闭</button>
+      </div>
+    </div>
+  </div>
+  <!-- Countdown Overlay -->
+  <div class="countdown-overlay" id="countdownOverlay" style="display:none;">
+    <div class="countdown-number" id="countdownNumber">3</div>
+    <div class="countdown-text">准备开始面试...</div>
+  </div>
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="js/config.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/star-analyzer.js"></script>
+  <script src="js/scorer.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    window.onload = function () {
+      const user = localStorage.getItem('user');
+      // 登录校验：无登录信息直接跳转login.html
+      if (!user) {
+        alert('请先登录账号');
+        location.href = 'login.html';
+      } else {
+        const info = JSON.parse(user);
+        // 右上角用户栏（头像、个人中心、退出登录）
+        const userWrap = document.createElement('div');
+        userWrap.style = `
+      position: fixed;
+      top: 14px;
+      right: 22px;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: system-ui, "Microsoft YaHei", sans-serif;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      padding: 7px 14px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.04);
+    `;
+        const avatarBox = document.createElement('img');
+        avatarBox.style = `
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+    `;
+        const localAvatar = localStorage.getItem('localAvatar');
+        if (localAvatar) {
+          avatarBox.src = localAvatar;
+        } else {
+          avatarBox.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect width="100" height="100" fill="url(%23g)"/><circle cx="50" cy="35" r="16" fill="#fff"/><path d="M50,60 Q70,60 80,85 L20,85 Q30,60 50,60" fill="#fff"/></svg>';
+        }
+        const nameText = `<span style="font-size:14px;color:#111;">${info.username}</span>`;
+        const btnUser = `<button id="toUserPage" style="border:none;background:#3b82f6;color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:13px;">个人中心</button>`;
+        const btnLogout = `<button id="logoutBtn" style="border:1px #d1d5db solid;background:#fff;color:#333;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:13px;">退出登录</button>`;
+        userWrap.appendChild(avatarBox);
+        userWrap.innerHTML += nameText + btnUser + btnLogout;
+        document.body.appendChild(userWrap);
+        // 按钮事件：退出登录清除缓存并跳转登录页
+        document.getElementById('toUserPage').onclick = () => location.href = 'user.html';
+        document.getElementById('logoutBtn').onclick = () => {
+          localStorage.removeItem('user');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('username');
+          location.href = 'login.html';
+        }
+      }
+    }
+    function getAllUsers() {
+      try { return JSON.parse(localStorage.getItem('users') || '[]'); }
+      catch (e) { return []; }
+    }
+    function saveInterviewRecord(summaryText) {
+      try {
+        const uid = parseInt(localStorage.getItem('userId') || '0');
+        if (!uid || uid === 0) {
+          console.warn('未登录，跳过保存面试记录');
+          return;
+        }
+        const users = getAllUsers();
+        const idx = users.findIndex(u => u.id === uid);
+        if (idx < 0) return;
+        if (!users[idx].records) users[idx].records = [];
+        const majorSel = document.getElementById('majorSelect');
+        const posSel = document.getElementById('positionSelect');
+        users[idx].records.push({
+          id: Date.now(),
+          time: new Date().toLocaleString('zh-CN', { hour12: false }),
+          content: summaryText,
+          major: majorSel ? majorSel.options[majorSel.selectedIndex]?.text || '' : '',
+          position: posSel ? posSel.options[posSel.selectedIndex]?.text || '' : ''
+        });
+        localStorage.setItem('users', JSON.stringify(users));
+      } catch (error) {
+        console.error('保存面试记录失败:', error);
+      }
+    }
+  </script>
+</body>
+
+</html>

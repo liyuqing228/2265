@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>登录</title>
+</head>
+
+<body>
+  <div style="width:300px;margin:100px auto;">
+    <h2>AI面试模拟器 登录</h2>
+    <input type="text" id="loginUser" placeholder="账号" style="width:100%;margin:8px 0;padding:8px;">
+    <input type="password" id="loginPwd" placeholder="密码" style="width:100%;margin:8px 0;padding:8px;">
+    <button id="loginBtn" style="width:100%;padding:10px;background:#007bff;color:#fff;border:none;">登录</button>
+    <p>没有账号？<a href="register.html">去注册</a></p>
+  </div>
+  <script>
+    function getAllUsers() {
+      try {
+        return JSON.parse(localStorage.getItem('users') || '[]');
+      } catch (e) { return []; }
+    }
+    window.onload = function () {
+      const loginBtn = document.getElementById("loginBtn");
+      loginBtn.onclick = function () {
+        const username = document.getElementById("loginUser").value.trim();
+        const password = document.getElementById("loginPwd").value.trim();
+        if (!username) {
+          alert("请输入账号");
+          return;
+        }
+        if (!password) {
+          alert("请输入密码");
+          return;
+        }
+        const users = getAllUsers();
+        const found = users.find(u => u.username === username && u.password === password);
+        if (found) {
+          const userInfo = { id: found.id, username: found.username, nickname: found.nickname || found.username, email: found.email || '' };
+          localStorage.setItem("user", JSON.stringify(userInfo));
+          localStorage.setItem("userId", found.id);
+          localStorage.setItem("username", found.username);
+          alert("登录成功！");
+          location.href = "index.html";
+        } else {
+          const anyUser = users.find(u => u.username === username);
+          if (anyUser) {
+            alert("密码错误，请重试");
+          } else {
+            alert("账号不存在，请先注册");
+          }
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>

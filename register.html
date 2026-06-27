@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>注册</title>
+</head>
+<body>
+<div style="width:300px;margin:100px auto;">
+<h2>AI面试模拟器 注册</h2>
+<input type="text" id="regUser" placeholder="账号" style="width:100%;margin:8px 0;padding:8px;">
+<input type="password" id="regPwd" placeholder="密码" style="width:100%;margin:8px 0;padding:8px;">
+<input type="password" id="regPwd2" placeholder="确认密码" style="width:100%;margin:8px 0;padding:8px;">
+<button id="regBtn" style="width:100%;padding:10px;background:#007bff;color:#fff;border:none;">注册</button>
+<p>已有账号？<a href="login.html">去登录</a></p>
+</div>
+<script>
+function getAllUsers(){
+  try {
+    return JSON.parse(localStorage.getItem('users') || '[]');
+  } catch(e){ return []; }
+}
+function saveAllUsers(users){
+  localStorage.setItem('users', JSON.stringify(users));
+}
+document.getElementById('regBtn').onclick = function(){
+  const username = document.getElementById('regUser').value.trim();
+  const pwd = document.getElementById('regPwd').value.trim();
+  const pwd2 = document.getElementById('regPwd2').value.trim();
+
+  if(!username) return alert("请输入账号");
+  if(username.length < 3) return alert("账号至少3个字符");
+  if(!pwd) return alert("请输入密码");
+  if(pwd.length < 6) return alert("密码至少6位");
+  if(pwd !== pwd2) return alert('两次密码不一致');
+
+  const users = getAllUsers();
+  if(users.find(u => u.username === username)){
+    alert("该账号已被注册，请换一个账号名");
+    return;
+  }
+  const newId = users.length > 0 ? Math.max.apply(null, users.map(u => u.id)) + 1 : 1;
+  users.push({
+    id: newId,
+    username: username,
+    password: pwd,
+    nickname: username,
+    email: '',
+    records: []
+  });
+  saveAllUsers(users);
+  alert("注册成功！请登录");
+  location.href = "login.html";
+}
+</script>
+</body>
+</html>
